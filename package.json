@@ -1,0 +1,35 @@
+{
+  "name": "@mcombuec/maulwurf",
+  "version": "0.0.1",
+  "description": "A simple CLI tool to tunnel into a database via Teleport.",
+  "type": "module",
+  "bin": "bin/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mcombuechen/maulwurf"
+  },
+  "scripts": {
+    "format": "prettier --write bin src",
+    "build": "tsc"
+  },
+  "keywords": [
+    "teleport",
+    "tsh",
+    "cli"
+  ],
+  "author": "Maximilian Combüchen <m@maximiliancombuechen.com>",
+  "license": "MIT",
+  "dependencies": {
+    "exit": "^0.1.2",
+    "inquirer": "^8.2.5",
+    "ora": "^6.3.1",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@types/exit": "^0.1.31",
+    "@types/inquirer": "^9.0.3",
+    "@types/yargs": "^17.0.24",
+    "prettier": "^2.8.8",
+    "typescript": "^5.1.3"
+  }
+}
