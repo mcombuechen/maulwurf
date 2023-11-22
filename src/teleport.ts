@@ -29,7 +29,10 @@ export async function createTunnel(
         rej(_err)
         return
       }
-      res({ stdout: _stdout, stderr: _stderr })
+      res({
+        stdout: _stdout,
+        stderr: _stderr,
+      })
     }
 
     tunnelProc.stdout.on("data", (data) => {
@@ -52,14 +55,8 @@ export async function createTunnel(
     })
   })
 
-  const [, port] = stdout.match(/\:(\d+)/i) || []
-
-  if (!port) {
-    throw new Error("could not determined port of tunnel connection")
-  }
-
   return {
-    port,
+    port: portNumber,
     abort: () => {
       process.stdout.write("Killing tunnel...\n")
       ctrl.abort("killing tunnel")
@@ -70,21 +67,27 @@ export async function createTunnel(
 export async function getAvailableDBs(): Promise<Set<string>> {
   const dbs = new Set<string>()
 
-  const { stdout } = await new Promise<{ stdout: string; stderr: string }>(
-    (res, rej) => {
-      child_process.exec(
-        "tsh db ls --format json",
-        { maxBuffer: 1024 * 1024 * 5 },
-        (err, stdout, stderr) => {
-          if (err) {
-            rej(err)
-          } else {
-            res({ stdout, stderr })
-          }
+  const { stdout } = await new Promise<{
+    stdout: string
+    stderr: string
+  }>((res, rej) => {
+    child_process.exec(
+      "tsh db ls --format json",
+      {
+        maxBuffer: 1024 * 1024 * 5,
+      },
+      (err, stdout, stderr) => {
+        if (err) {
+          rej(err)
+        } else {
+          res({
+            stdout,
+            stderr,
+          })
         }
-      )
-    }
-  )
+      }
+    )
+  })
 
   const parsed = JSON.parse(stdout)
 
@@ -109,7 +112,10 @@ export async function logIntoDB(dbName: string): Promise<void> {
       if (err) {
         rej(err)
       } else {
-        res({ stdout, stderr })
+        res({
+          stdout,
+          stderr,
+        })
       }
     })
   })

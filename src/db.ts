@@ -1,12 +1,12 @@
 import inquirer from "inquirer"
-import { oraPromise as spinner } from "ora"
 
-import { getAvailableDBs } from "./teleport.js"
+import { getAvailableDBs } from "./teleport"
+import { executeWithSpinner } from "./spinner"
 
 export async function getDBName(searchTerms: string[]): Promise<string> {
-  const availableDBs = await spinner(
-    getAvailableDBs(),
-    "Loading available databases"
+  const availableDBs = await executeWithSpinner(
+    "Loading available databases",
+    getAvailableDBs
   )
 
   // check if exact db name has been provided
@@ -26,7 +26,9 @@ export async function getDBName(searchTerms: string[]): Promise<string> {
     filteredDBs = [...availableDBs]
   }
 
-  const input = await inquirer.prompt<{ dbName: string }>([
+  const input = await inquirer.prompt<{
+    dbName: string
+  }>([
     {
       type: "list",
       name: "dbName",
