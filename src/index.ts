@@ -1,25 +1,33 @@
 import inquirer from "inquirer"
 import exit from "exit"
-import { oraPromise as spinner } from "ora"
+import ora from "ora"
 
-import { parseArgs } from "./args.js"
-import { createTunnel, logIntoDB } from "./teleport.js"
-import { println, waitForEscKey } from "./tty.js"
-import { getDBName } from "./db.js"
+import { parseArgs } from "./args"
+import { createTunnel, logIntoDB } from "./teleport"
+import { println, waitForEscKey } from "./tty"
+import { getDBName } from "./db"
+import { executeWithSpinner } from "./spinner"
 
 // todos
 // - context info
 // - check for tsh
 
-export default async function main() {
-  const { portNumber, searchTerms } = parseArgs()
+export default async function main(args?: any) {
+  let { portNumber, searchTerms } = args || parseArgs()
   const dbName: string = await getDBName(searchTerms)
 
-  await spinner(logIntoDB(dbName), `Logging into ${dbName}`)
+  if (!portNumber) {
+    portNumber = Math.floor(Math.random() * 20000) + 50000 // generate a random port number between 5000 and 7000
+    println(`No port number supplied, will use port: ${portNumber}`)
+  }
 
-  const { port, abort } = await spinner(
-    createTunnel(dbName, portNumber),
-    `Creating tunnel to ${dbName}`
+  await executeWithSpinner(`Logging into ${dbName}`, logIntoDB, dbName)
+
+  const { abort, port } = await executeWithSpinner(
+    `Creating tunnel to ${dbName}`,
+    createTunnel,
+    dbName,
+    portNumber
   )
 
   println(`Tunnel created on port :${port}`)
